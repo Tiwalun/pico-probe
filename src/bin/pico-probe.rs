@@ -69,11 +69,13 @@ mod app {
 
             match request {
                 Request::DAP1Command((report, n)) => {
+                    /*
                     let len = dap.process_command(&report[..n], resp_buf, DapVersion::V1);
 
                     if len > 0 {
                         probe_usb.dap1_reply(&resp_buf[..len]);
                     }
+                    */
                 }
                 Request::DAP2Command((report, n)) => {
                     let len = dap.process_command(&report[..n], resp_buf, DapVersion::V2);

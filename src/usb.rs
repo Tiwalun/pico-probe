@@ -4,12 +4,14 @@ use rp2040_hal::usb::UsbBus;
 use usb_device::{class_prelude::*, prelude::*};
 use usbd_serial::SerialPort;
 
+use crate::winusb::MicrosoftDescriptors;
+
 /// Implements the CMSIS DAP descriptors.
 pub struct ProbeUsb {
     device: UsbDevice<'static, UsbBus>,
     device_state: UsbDeviceState,
-    // winusb: MicrosoftDescriptors,
-    dap_v1: CmsisDapV1<'static, UsbBus>,
+    winusb: MicrosoftDescriptors,
+    //  dap_v1: CmsisDapV1<'static, UsbBus>,
     dap_v2: CmsisDapV2<'static, UsbBus>,
     serial: SerialPort<'static, UsbBus>,
     // dfu: DfuRuntime,
@@ -18,7 +20,8 @@ pub struct ProbeUsb {
 impl ProbeUsb {
     #[inline(always)]
     pub fn new(usb_bus: &'static UsbBusAllocator<UsbBus>) -> Self {
-        let dap_v1 = CmsisDapV1::new(64, usb_bus);
+        let winusb = MicrosoftDescriptors;
+        //let dap_v1 = CmsisDapV1::new(64, usb_bus);
         let dap_v2 = CmsisDapV2::new(64, usb_bus);
         let serial = SerialPort::new(&usb_bus);
 
@@ -28,7 +31,7 @@ impl ProbeUsb {
             .manufacturer("Probe-rs development team")
             .product("Pico-Probe with CMSIS-DAP v1/v2 Support")
             .serial_number(id)
-            .device_release(0x11)
+            .device_release(0x13)
             .composite_with_iads()
             .max_packet_size_0(64)
             .max_power(500)
@@ -38,7 +41,8 @@ impl ProbeUsb {
         ProbeUsb {
             device,
             device_state,
-            dap_v1,
+            winusb,
+            //    dap_v1,
             dap_v2,
             serial,
         }
@@ -46,8 +50,8 @@ impl ProbeUsb {
 
     pub fn interrupt(&mut self) -> Option<Request> {
         if self.device.poll(&mut [
-            // &mut usb.winusb,
-            &mut self.dap_v1,
+            &mut self.winusb,
+            //&mut self.dap_v1,
             &mut self.dap_v2,
             &mut self.serial,
             // &mut usb.dfu,
@@ -58,11 +62,13 @@ impl ProbeUsb {
             if (old_state != new_state) && (new_state != UsbDeviceState::Configured) {
                 return Some(Request::Suspend);
             }
+            /*
 
             let r = self.dap_v1.process();
             if r.is_some() {
                 return r;
             }
+            */
 
             let r = self.dap_v2.process();
             if r.is_some() {
@@ -76,12 +82,14 @@ impl ProbeUsb {
         None
     }
 
+    /*
     /// Transmit a DAP report back over the DAPv1 HID interface
     pub fn dap1_reply(&mut self, data: &[u8]) {
         self.dap_v1
             .write_packet(data)
             .expect("DAPv1 EP write failed");
     }
+    */
 
     /// Transmit a DAP report back over the DAPv2 bulk interface
     pub fn dap2_reply(&mut self, data: &[u8]) {
