@@ -28,7 +28,8 @@ impl ProbeUsb {
             .manufacturer("Probe-rs development team")
             .product("Pico-Probe with CMSIS-DAP v1/v2 Support")
             .serial_number(id)
-            .device_class(0)
+            .device_release(0x11)
+            .composite_with_iads()
             .max_packet_size_0(64)
             .max_power(500)
             .build();
