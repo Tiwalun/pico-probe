@@ -22,7 +22,7 @@ enum MsDescriptorTypes {
 
 const VENDOR_ID: u8 = 0x42;
 
-const DESCRIPTOR_SIZE: u16 = 168;
+const DESCRIPTOR_SIZE: u16 = 170;
 
 pub const DAP_V2_INTERFACE: u8 = 2;
 
@@ -68,7 +68,7 @@ const MS_DESCRIPTOR: [u8; DESCRIPTOR_SIZE as usize] = [
     0x00,
     0x00, // Sub-Compatible ID: 8 bytes ASCII
     // Registry property
-    78 + 2 + 42 + 2 + 2 + 2 + 2,
+    80 + 2 + 42 + 2 + 2 + 2 + 2,
     0x00, // length
     MsDescriptorTypes::RegistryProperty as u8,
     0x00,
@@ -118,7 +118,7 @@ const MS_DESCRIPTOR: [u8; DESCRIPTOR_SIZE as usize] = [
     0,
     0,
     0,
-    78,
+    80,
     0x00, // data length
     b'{',
     0,
@@ -195,6 +195,8 @@ const MS_DESCRIPTOR: [u8; DESCRIPTOR_SIZE as usize] = [
     b'6',
     0,
     b'}',
+    0,
+    0,
     0,
     0,
     0,
