@@ -22,8 +22,8 @@ impl ProbeUsb {
     pub fn new(usb_bus: &'static UsbBusAllocator<UsbBus>) -> Self {
         let winusb = MicrosoftDescriptors;
         //let dap_v1 = CmsisDapV1::new(64, usb_bus);
-        let dap_v2 = CmsisDapV2::new(64, usb_bus);
         let serial = SerialPort::new(&usb_bus);
+        let dap_v2 = CmsisDapV2::new(64, usb_bus);
 
         let id = crate::device_signature::device_id_hex();
         info!("Device ID: {}", id);
@@ -31,7 +31,7 @@ impl ProbeUsb {
             .manufacturer("Probe-rs development team")
             .product("Pico-Probe with CMSIS-DAP v1/v2 Support")
             .serial_number(id)
-            .device_release(0x13)
+            .device_release(0x14)
             .composite_with_iads()
             .max_packet_size_0(64)
             .max_power(500)
@@ -52,8 +52,8 @@ impl ProbeUsb {
         if self.device.poll(&mut [
             &mut self.winusb,
             //&mut self.dap_v1,
-            &mut self.dap_v2,
             &mut self.serial,
+            &mut self.dap_v2,
             // &mut usb.dfu,
         ]) {
             let old_state = self.device_state;
@@ -62,6 +62,11 @@ impl ProbeUsb {
             if (old_state != new_state) && (new_state != UsbDeviceState::Configured) {
                 return Some(Request::Suspend);
             }
+
+            // Discard data from the serial interface
+            let mut buf = [0; 64 as usize];
+            let _ = self.serial.read(&mut buf);
+
             /*
 
             let r = self.dap_v1.process();
@@ -74,10 +79,6 @@ impl ProbeUsb {
             if r.is_some() {
                 return r;
             }
-
-            // Discard data from the serial interface
-            let mut buf = [0; 64 as usize];
-            let _ = self.serial.read(&mut buf);
         }
         None
     }

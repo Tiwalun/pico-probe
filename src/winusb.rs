@@ -24,7 +24,7 @@ const VENDOR_ID: u8 = 0x42;
 
 const DESCRIPTOR_SIZE: u16 = 168;
 
-pub const DAP_V2_INTERFACE: u8 = 0;
+pub const DAP_V2_INTERFACE: u8 = 2;
 
 const MS_DESCRIPTOR: [u8; DESCRIPTOR_SIZE as usize] = [
     0xa,
